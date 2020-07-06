@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -6,7 +7,7 @@ namespace WhatsApp
 {
     public class Agenda : IAgenda
     {
-        List<Contato> contatoss = new List<Contato>();
+        List<Contato> contatos = new List<Contato>();
         private string PATH = @"Database/produto.csv";
 
         //----------------------------------
@@ -28,7 +29,7 @@ namespace WhatsApp
         private List<Contato> Ler()
         {
             
-            List<Contato> contatoss = new List<Contato>();
+            
 
             
             string[] linhas = File.ReadAllLines(PATH);
@@ -40,22 +41,17 @@ namespace WhatsApp
 
                 
                 Contato c   = new Contato();
-                c.ID        = int.Parse( Separar(dado[0]) );
-                c.nome      = Separar(dado[1]);
-                c.telefone  = int.Parse( Separar(dado[2]) );
+                c.ID        = (dado[0]);
+                c.nome      = (dado[1]);
+                c.telefone  = (dado[2]);
 
-                contatoss.Add(c);
-                contatoss = contatoss.OrderBy(y => y.nome).ToList();
+                contatos.Add(c);
+                contatos = contatos.OrderBy(y => y.nome).ToList();
             }
-                return contatoss; 
+                return contatos; 
         }
         //----------------------------------
-        private string Separar(string _coluna)
-        {
-            // 0      1
-            // nome = Gibson
-            return _coluna.Split("=")[1];
-        }
+       
 
         //----------------------------------
         public void Cadastrar(Contato conta)
@@ -66,7 +62,7 @@ namespace WhatsApp
         }
         //----------------------------------
 
-        public void Excluir(string _nome)
+        public void Excluir(Contato co)
         {
             
             List<string> linhas = new List<string>();
@@ -78,32 +74,32 @@ namespace WhatsApp
                     linhas.Add(linha);
                 }
             }
-            
-            linhas.RemoveAll(z => z.Split(";")[1].Contains(_nome));
-            
-
+            linhas.RemoveAll(z => z.Contains(co.ID));
         }
         //----------------------------------
 
-        public void Listar(Contato c)
+        public List<Contato> Listar()
         
         {
+            
+            string[] linhas = File.ReadAllLines(PATH);
            
-            using(StreamReader arquivo = new StreamReader(PATH))
+            foreach(string linha in linhas)
             {
-                string linha;
-                while((linha = arquivo.ReadLine()) != null)
-                {
-                    System.Console.WriteLine($"ID do do contato: {c.ID}; Nome do contato é : {c.nome}; e o telefone do contato é: {c.telefone}");
-                }
-            }
+                string[] dado = linha.Split(";");
+                contatos.Add(new Contato(dado[0], dado[1], dado [2] ));
+            }         
+            contatos = contatos.OrderBy(z => z.nome).ToList();
+            return contatos;   
             
         }
         //----------------------------------
         private string prepararLinhaCSV( Contato c)
         {
-            return $"ID do do contato: {c.ID}; Nome do contato é : {c.nome}; e o telefone do contato é: {c.telefone}";
+            return $"{c.ID}; {c.nome}; {c.telefone}";
         }
+
+        
         //----------------------------------
     }
 }
